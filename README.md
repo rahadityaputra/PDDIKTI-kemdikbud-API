@@ -1,135 +1,240 @@
-# 🎓 PDDIKTI API Python Library
+# 🚀 PDDIKTI REST API
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/39e00a8c8c1c4007a68d1ae3f53c03e7)](https://app.codacy.com/gh/IlhamriSKY/PDDIKTI-kemdikbud-API/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-[![python3.x](https://img.shields.io/badge/3.12.1-blue.svg?&logo=python&label=Python)](https://www.python.org/downloads/release/python-3121/)
-[![Version 2.0.6](https://img.shields.io/pypi/v/pddiktipy?logo=Python&logoColor=white&label=PyPI&color=c125ff)](https://pypi.org/project/pddiktipy/)
-[![Downloads](https://img.shields.io/pepy/dt/pddiktipy?logo=PyPI&logoColor=white&label=Downloads&color=c125ff)](https://www.pepy.tech/projects/pddiktipy)
-[![Author](https://img.shields.io/badge/Author-Ilham%20Riski-blue.svg?style=flat)](https://github.com/IlhamriSKY)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/IlhamriSKY/PDDIKTI-kemdikbud-API/blob/master/LICENSE)
+REST API wrapper untuk mengakses data PDDIKTI (Pangkalan Data Pendidikan Tinggi) Indonesia.
 
-> **Library Python untuk mengakses data PDDIKTI Kemdikbud dengan mudah, aman, dan terdokumentasi lengkap**
+## 📋 Quick Start
 
-Wrapper API Python yang powerful dan user-friendly untuk mengambil data dari [PDDIKTI](https://pddikti.kemdikbud.go.id/) Kemdikbud. Library ini menyediakan interface yang mudah digunakan untuk mengakses data mahasiswa, dosen, perguruan tinggi, dan program studi di Indonesia dengan dukungan type hints, error handling yang komprehensif, dan dokumentasi lengkap.
-
-## 📋 Daftar Isi
-
-- [🚀 Fitur Utama](#-fitur-utama)
-- [📦 Instalasi](#-instalasi)
-- [⚡ Quick Start](#-quick-start)
-- [⚠️ Error Handling](#️-error-handling)
-- [📚 Dokumentasi Lengkap](#-dokumentasi-lengkap)
-- [📊 Struktur Data Response](#-struktur-data-response)
-- [📝 Changelog](#-changelog)
-- [📋 Requirements](#-requirements)
-- [🧪 Testing](#-testing)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
-
-## 🚀 Fitur Utama
-
-- ✅ **Type Hints Lengkap**: Full type annotations untuk better IDE support
-- ✅ **Error Handling Komprehensif**: Custom exceptions dan validation
-- ✅ **Context Manager Support**: Resource management yang aman
-- ✅ **Dokumentasi Lengkap**: Google-style docstrings dengan 63 API methods
-- ✅ **Performance Optimized**: Connection pooling dan retry strategy
-- ✅ **Indonesian Context**: Field explanations dalam konteks pendidikan Indonesia
-- ✅ **Flexible Parameters**: Support untuk integer dan string parameters
-- ✅ **Production Ready**: Enhanced validation dan logging
-
-## 📦 Instalasi
-
+### Instalasi Dependencies
 ```bash
-pip install pddiktipy
+pip install -r requirements.txt
 ```
 
-**Requirements:**
-- Python 3.7+
-- requests
-- urllib3
+### Menjalankan Server
+```bash
+# Development mode
+python app.py
 
-## ⚡ Quick Start
+# Production mode dengan Gunicorn
+gunicorn -w 4 -b 0.0.0.0:5000 app:app
+```
 
+Server akan berjalan di: **http://localhost:5000**
+
+## 🔗 API Endpoints
+
+### 🏛️ **Universities (Perguruan Tinggi)**
+
+#### 1. Cari Kampus
+```
+GET /api/v1/universities/search?q=<keyword>
+```
+**Contoh**: `GET /api/v1/universities/search?q=Universitas Indonesia`
+
+#### 2. Detail Kampus
+```
+GET /api/v1/universities/<university_id>
+```
+
+#### 3. Program Studi Kampus
+```
+GET /api/v1/universities/<university_id>/programs?semester=<YYYYS>
+```
+**Contoh**: `GET /api/v1/universities/xxx/programs?semester=20241`
+
+#### 4. Logo Kampus
+```
+GET /api/v1/universities/<university_id>/logo
+```
+
+#### 5. Statistik Kampus
+```
+GET /api/v1/universities/<university_id>/stats
+```
+
+### 👨‍🎓 **Students (Mahasiswa)**
+
+#### 1. Cari Mahasiswa
+```
+GET /api/v1/students/search?q=<keyword>
+```
+
+#### 2. Detail Mahasiswa
+```
+GET /api/v1/students/<student_id>
+```
+
+### 👨‍🏫 **Lecturers (Dosen)**
+
+#### 1. Cari Dosen
+```
+GET /api/v1/lecturers/search?q=<keyword>
+```
+
+#### 2. Profil Dosen
+```
+GET /api/v1/lecturers/<lecturer_id>
+```
+
+#### 3. Riset & Aktivitas Dosen
+```
+GET /api/v1/lecturers/<lecturer_id>/research
+```
+
+### 📚 **Programs (Program Studi)**
+
+#### 1. Cari Program Studi
+```
+GET /api/v1/programs/search?q=<keyword>
+```
+
+#### 2. Detail Program Studi
+```
+GET /api/v1/programs/<program_id>
+```
+
+### 🔍 **Global Search**
+
+#### Pencarian Universal
+```
+GET /api/v1/search?q=<keyword>
+```
+
+### 📊 **Statistics**
+
+#### 1. Statistik Nasional
+```
+GET /api/v1/statistics/counts
+```
+
+#### 2. Data Visualisasi
+```
+GET /api/v1/statistics/visualizations?category=<universities|students|lecturers|programs>
+```
+
+## 📝 Format Response
+
+### Success Response
+```json
+{
+  "success": true,
+  "message": "Success message",
+  "data": {
+    // Response data
+  }
+}
+```
+
+### Error Response
+```json
+{
+  "success": false,
+  "error": "Error message",
+  "data": null
+}
+```
+
+## 💻 Contoh Penggunaan
+
+### 1. Cari Daftar Kampus
+```bash
+curl "http://localhost:5000/api/v1/universities/search?q=Universitas"
+```
+
+### 2. JavaScript/Fetch
+```javascript
+// Cari kampus
+const response = await fetch('http://localhost:5000/api/v1/universities/search?q=ITB');
+const data = await response.json();
+
+if (data.success) {
+  console.log('Kampus ditemukan:', data.data);
+} else {
+  console.error('Error:', data.error);
+}
+```
+
+### 3. Python requests
 ```python
-from pddiktipy import api
-from pprint import pprint
+import requests
 
-# Menggunakan context manager (recommended)
-with api() as client:
-    # Cari semua data dengan keyword
-    hasil = client.search_all('Unika Soegijapranata')
-    pprint(hasil)
-    
-    # Cari mahasiswa spesifik
-    mahasiswa = client.search_mahasiswa('Ilham Riski Wibowo')
-    pprint(mahasiswa)
+# Cari kampus
+response = requests.get('http://localhost:5000/api/v1/universities/search', 
+                       params={'q': 'Institut Teknologi Bandung'})
+data = response.json()
+
+if data['success']:
+    print(f"Ditemukan {len(data['data']['data'])} kampus")
+    for kampus in data['data']['data']:
+        print(f"- {kampus['nama']}")
 ```
 
-## ⚠️ Error Handling
+## 🌐 CORS Support
 
-Library ini menyediakan error handling yang komprehensif:
+API ini sudah mengaktifkan CORS, sehingga dapat diakses dari frontend web application.
 
-```python
-from pddiktipy import api
-from pddiktipy.exceptions import (
-    ValidationError, 
-    APIConnectionError, 
-    APITimeoutError,
-    PDDIKTIError
-)
+## 🔧 Configuration
 
-try:
-    with api() as client:
-        # Ini akan raise ValidationError karena keyword kosong
-        result = client.search_mahasiswa("")
-        
-except ValidationError as e:
-    print(f"Error validasi: {e}")
-except APIConnectionError as e:
-    print(f"Error koneksi: {e}")
-except APITimeoutError as e:
-    print(f"Request timeout: {e}")
-except PDDIKTIError as e:
-    print(f"Error PDDIKTI API: {e}")
+### Environment Variables
+```bash
+export FLASK_ENV=development  # untuk development
+export FLASK_ENV=production   # untuk production
 ```
 
-## 📚 Dokumentasi Lengkap
+### Production Deployment
+```bash
+# Dengan Gunicorn (recommended)
+gunicorn -w 4 -b 0.0.0.0:8000 app:app
 
-**➡️ [API Documentation](documentation/API_DOCUMENTATION.md)** - 63 method API dengan dokumentasi komprehensif, contoh penggunaan, dan struktur data response
+# Dengan uWSGI
+uwsgi --http :8000 --wsgi-file app.py --callable app --processes 4
+```
 
-## 📊 Struktur Data Response
+## 📊 Response Data Structure
 
-Semua response API menggunakan TypedDict untuk type safety dan konsistensi. Struktur data disesuaikan dengan konteks pendidikan Indonesia dan standar PDDIKTI.
+### University Search Response
+```json
+{
+  "success": true,
+  "message": "Found 5 universities matching 'ITB'",
+  "data": {
+    "data": [
+      {
+        "id": "university_id_base64",
+        "kode": "001234",
+        "nama_singkat": "ITB",
+        "nama": "Institut Teknologi Bandung"
+      }
+    ]
+  }
+}
+```
 
-## 📝 Changelog
+### University Detail Response
+```json
+{
+  "success": true,
+  "message": "University details retrieved successfully",
+  "data": {
+    "nama_pt": "Institut Teknologi Bandung",
+    "alamat": "Jl. Ganesha No. 10, Bandung",
+    "website": "https://www.itb.ac.id",
+    "email": "humas@itb.ac.id",
+    "akreditasi_pt": "A",
+    "status_pt": "Aktif"
+  }
+}
+```
 
-**📝 [Changelog](documentation/CHANGELOG.md)** - Riwayat versi dan roadmap pengembangan
+## 🚀 URL Endpoints Summary
 
-## 📋 Requirements
+**Base URL**: `http://localhost:5000` 
 
-- **Python 3.7+**
-- **requests**
-- **urllib3**
+### Untuk Daftar Kampus (yang Anda minta):
+- **Cari Kampus**: `GET /api/v1/universities/search?q=<keyword>`
+- **Detail Kampus**: `GET /api/v1/universities/<university_id>`
+- **Program Studi**: `GET /api/v1/universities/<university_id>/programs?semester=20241`
+- **Logo Kampus**: `GET /api/v1/universities/<university_id>/logo`
+- **Statistik**: `GET /api/v1/universities/<university_id>/stats`
 
-## 🧪 Testing
-
-**🧪 [Testing Guide](documentation/TESTING.md)** - Panduan testing dan quality assurance
-
-## 🤝 Contributing
-
-**🤝 [Contributing Guide](documentation/CONTRIBUTING.md)** - Panduan berkontribusi pada proyek
-
-## 📄 License
-
-**📄 [MIT License](LICENSE)** - Distributed under the MIT License
-
----
-
-## 📞 Support & Contact
-
-- **Author**: [Ilham Riski Wibowo](https://github.com/IlhamriSKY)
-- **Issues**: [GitHub Issues](https://github.com/IlhamriSKY/PDDIKTI-kemdikbud-API/issues)
-- **PyPI**: [pddiktipy](https://pypi.org/project/pddiktipy/)
-
----
-
-**⭐ Jika library ini membantu proyek Anda, jangan lupa untuk memberikan star di GitHub!**
+### Test Endpoint
+Akses `http://localhost:5000/` untuk melihat daftar lengkap semua endpoint.
